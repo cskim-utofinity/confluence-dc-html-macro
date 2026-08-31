@@ -2,8 +2,8 @@
 
 `confluence-dc-html-macro`는 Confluence Data Center / Server의 "HTML 매크로"에 붙여넣을 HTML/CSS 코드를 작성해주는
 [Claude Code](https://claude.com/claude-code) 스킬입니다. 콜아웃 박스, 스타일 표, 카드, 배지,
-버튼, 배너, 레이아웃 등을 만들어 주는데, Confluence 렌더링 특이사항에 걸리지 않고 스타일이
-페이지 나머지 영역으로 새지 않습니다.
+버튼, 배너, 레이아웃 등을 만들어 줍니다. Confluence 렌더링 특이사항에 걸리지 않고, 스타일이
+페이지 다른 영역까지 오염시키지도 않습니다.
 
 스킬 본문([`skills/confluence-dc-html-macro/SKILL.md`](skills/confluence-dc-html-macro/SKILL.md))은 한국어
 Confluence DC/Server 환경을 대상으로 하기 때문에 한국어로 쓰여 있습니다. 다만 여기 담긴
