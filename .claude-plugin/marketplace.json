@@ -1,0 +1,20 @@
+{
+  "name": "confluence-dc-html-macro",
+  "owner": {
+    "name": "cskim"
+  },
+  "metadata": {
+    "description": "Confluence Data Center HTML 매크로 스킬 마켓플레이스",
+    "version": "1.0.0",
+    "pluginRoot": "."
+  },
+  "plugins": [
+    {
+      "name": "confluence-dc-html-macro",
+      "source": "./",
+      "description": "Confluence Data Center / Server의 HTML 매크로에 붙여넣을 HTML/CSS 코드를 작성하는 스킬.",
+      "version": "1.0.0",
+      "keywords": ["confluence", "html-macro", "data-center"]
+    }
+  ]
+}

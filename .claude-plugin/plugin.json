@@ -1,0 +1,16 @@
+{
+  "name": "confluence-dc-html-macro",
+  "version": "1.0.0",
+  "description": "Confluence Data Center / Server의 HTML 매크로에 붙여넣을 HTML/CSS 코드를 작성하는 스킬.",
+  "author": {
+    "name": "cskim"
+  },
+  "homepage": "https://github.com/cskim-utofinity/confluence-dc-html-macro",
+  "repository": "https://github.com/cskim-utofinity/confluence-dc-html-macro",
+  "license": "MIT",
+  "keywords": [
+    "confluence",
+    "html-macro",
+    "data-center"
+  ]
+}

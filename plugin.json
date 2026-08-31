@@ -1,0 +1,5 @@
+{
+  "$schema": "https://antigravity.google/schemas/v1/plugin.json",
+  "name": "confluence-dc-html-macro",
+  "description": "Confluence Data Center / Server의 HTML 매크로에 붙여넣을 HTML/CSS 코드를 작성하는 스킬."
+}
