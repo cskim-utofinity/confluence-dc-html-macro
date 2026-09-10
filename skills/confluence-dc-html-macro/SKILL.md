@@ -39,7 +39,7 @@ description: Write HTML/CSS code to paste into the Confluence Data Center "HTML 
    - **`.html` 첨부파일은 iframe으로 못 띄운다.** Confluence는 보안상 `.html` 첨부를 `Content-Disposition: attachment` 로 내려주므로, iframe `src`에 `.html` 첨부 URL을 넣으면 렌더링이 아니라 **파일 다운로드**가 된다. 이건 서버 헤더 문제라 `loading` 속성이나 `<script>`로도 못 바꾼다. 대안 3가지:
      1. (가장 확실) HTML 매크로 안이므로 **그 HTML 내용을 팝업/본문 div에 직접 삽입**한다. 단 완전한 문서면 `<html>/<head>/<body>` 껍데기는 빼고 `<body>` 안쪽만 넣고, 삽입할 HTML의 `<style>`도 고유 클래스로 스코프돼 있는지 확인(없으면 페이지 오염).
      2. 내용을 **별도 Confluence 페이지**로 만들고 그 **페이지 URL**을 iframe `src`로 쓴다(같은 호스트라 SAMEORIGIN 임베드 허용, 첨부와 달리 inline 렌더). 다만 iframe 안에 Confluence 헤더/사이드바가 같이 보일 수 있음.
-     3. iframe `srcdoc="...escape된 HTML..."` 로 감싼다. 길이가 짧을 때만이 아니라 **매크로 본문 치환을 통째로 우회**하고 싶을 때도 쓴다(규칙 13). srcdoc 안쪽은 태그가 아니라 속성값 문자열이라 매크로의 손을 안 탄다. 속성값이므로 `&` → `&amp;` 를 **먼저** 치환하고 그다음 `<` `>` `"` 순으로 바꾼다(순서를 바꾸면 `&quot;` 의 `&` 가 다시 치환돼 깨진다). 부등호까지 바꾸면 결과물에 `<script` 라는 문자열 자체가 안 남는다.
+     3. iframe `srcdoc="...escape된 HTML..."` 로 감싼다. 길이가 짧을 때만이 아니라 **매크로 본문 치환을 통째로 우회**하고 싶을 때도 쓴다(규칙 13). srcdoc 안쪽은 태그가 아니라 속성값 문자열이라 **태그로 해석되지 않는다.** 속성값이므로 `&` → `&amp;` 를 **먼저** 치환하고 그다음 `<` `>` `"` 순으로 바꾼다(순서를 바꾸면 `&quot;` 의 `&` 가 다시 치환돼 깨진다). 부등호까지 바꾸면 결과물에 `<script` 라는 문자열 자체가 안 남는다. **다만 엔티티는 속성값에서도 풀린다.** `&quot;` 가 속성을 끊어 iframe이 빈 채로 렌더될 수 있으니(규칙 13) 저장 후 화면부터 확인하라.
    - **mp4 등 동영상 첨부는 inline 재생된다.** `<video controls><source src="첨부 URL" type="video/mp4"></video>` 로 정상 동작.
    - **숨김 상태 미디어의 미리 로드 주의.** CSS로 `display:none` 처리해도 `<video>`는 `preload="none"` 을 줘야 재생 전까지 안 받는다. **iframe은 숨겨도 페이지 로드 시 미리 불러올 수 있다**(`loading="lazy"` 로도 완전히 못 막음) — 클릭 시점 로드가 꼭 필요하면 순수 CSS로는 한계가 있고 JS가 필요하다고 알린다.
    - 외부 사이트 iframe은 상대의 `X-Frame-Options`/`CSP frame-ancestors` 로 막히면 빈 화면이 되니, 그 경우 새 창 링크(`<a target="_blank" rel="noopener">`)로 대체한다.
@@ -105,7 +105,7 @@ description: Write HTML/CSS code to paste into the Confluence Data Center "HTML 
       ```
       `-webkit-text-fill-color`까지 같이 잠그는 건 일부 테마가 그걸로 글자색을 덮기 때문이다.
     - 규칙 9의 "`!important`는 링크에만" 원칙에 예외가 둘 더 생긴 셈이다. **링크 색·목록 마커·표 머리글** 셋은 Confluence가 먼저 칠하므로 덮어쓸 수밖에 없다. 나머지 스타일까지 `!important`로 바르지는 말 것.
-    - **미해결 — `<iframe srcdoc>` 안에서도 같은 증상이 관측됐다.** iframe 안은 별도 문서라 Confluence CSS가 닿을 이유가 없는데도 배경만 밀렸다는 보고가 있다. 원인을 못 찾았으니 적어만 둔다. 그 경우에도 위 `!important`로 덮으면 해결된다.
+    - **`<iframe srcdoc>` 안에서는 안 밀린다 (실측).** iframe 안은 별도 문서라 Confluence CSS가 닿지 않아, `!important` 없는 `.t th{background:#0052CC}` 만으로도 그대로 나온다. 즉 이 규칙은 매크로 본문에 직접 넣은 표에만 해당한다.
 
 12. **대용량 JS 앱(벤더 라이브러리 포함)도 매크로에서 동작한다 — 다만 벤더 하나만 조용히 죽는 함정이 있다.** HTML 매크로 출력은 서버에서 페이지 마크업에 그대로 렌더되므로 **인라인 `<script>`는 문서 순서대로 정상 실행**되고, `<script src>`도 순서가 보장된다. 수십~수백 KB 규모에 `<script>` 여러 개를 넣어도 **파일 맨 끝 블록까지 실행된 사례가 있다.** "대용량이라 안 된다"는 통념부터 버리고 시작하라 — 막히는 지점은 대개 크기가 아니다.
     - **벤더 블록 하나만 조용히 실패하면, 아래를 한 번에 하나씩만 바꿔가며 배너로 확인한다.** 여러 개를 동시에 건드리면 증상이 겹쳐 진단이 꼬인다.
@@ -195,6 +195,9 @@ description: Write HTML/CSS code to paste into the Confluence Data Center "HTML 
       <div class="cf-t">❌ script 미실행</div>
       <script>document.querySelector('.cf-t').textContent='✅ script 실행됨';</script>
       ```
+    - **텍스트뿐 아니라 속성값에서도 풀린다 (실측).** `srcdoc` 안에 `class=&quot;t&quot;` 를 넣으면 `&quot;` 가 `"` 로 풀리면서 **속성값이 거기서 끊겨** iframe이 빈 채로 렌더된다(하얀 네모). 같은 코드에서 따옴표를 없앤 `class=t` 로 바꾸면 정상 동작한다. 두 판본의 차이가 그것뿐이라 원인은 확실하다.
+      - 대응은 **속성값에 따옴표를 안 쓰는 것**이다. HTML은 공백·따옴표·`=`·`<`·`>`·백틱이 없는 단순한 값이면 따옴표를 생략할 수 있다.
+      - 다만 `srcdoc` 으로 완전한 문서를 감쌀 때는 따옴표를 피할 수 없다. 그런 코드가 실제로 동작하는 사례도 있어 **어떤 조건에서 살아남는지는 아직 못 밝혔다.** srcdoc 래퍼를 쓸 거면 저장 후 화면부터 확인하라.
     - **규칙 6의 `<iframe srcdoc>` 이 이 문제를 우회하는 이유가 여기 있다.** srcdoc으로 감쌀 때 `&` 를 `&amp;` 로 선치환하는데, 매크로의 디코딩이 그걸 원래대로 되돌려 정확히 상쇄된다. 원인을 모르면 "srcdoc이 script 필터를 우회한다"고 오해하기 쉽지만 우회 대상은 필터가 아니라 이 디코딩이다. 알고 나면 래퍼 없이 `\x26` 만으로 충분하고, 래퍼와 빌드 단계를 통째로 지울 수 있다.
 
 ## 출력 형식
